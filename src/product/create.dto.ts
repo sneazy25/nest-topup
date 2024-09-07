@@ -23,21 +23,6 @@ class Variation {
     published: boolean;
 }
 
-enum FormType {
-    TEXT = 'text',
-    NUMBER = 'number',
-}
-
-class Form {
-    @IsString()
-    @IsDefined()
-    name: string;
-
-    @IsEnum(FormType)
-    @IsDefined()
-    type: FormType;
-}
-
 export class CreateDto {
     @IsNotEmpty()
     @IsString()
@@ -63,13 +48,6 @@ export class CreateDto {
     @ValidateNested({ each: true })
     @Type(() => Variation)
     variations: Variation;
-
-    @IsArray()
-    @ArrayNotEmpty()
-    @ArrayMinSize(1)
-    @ValidateNested({ each: true })
-    @Type(() => Form)
-    form: any;
 
     @IsNotEmpty()
     @IsBoolean()

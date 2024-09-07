@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { CreateDto } from './create.dto';
 import { UpdateDto } from './update.dto';
@@ -53,7 +52,11 @@ export class ProductService {
                 message: 'Product retrieved successfully.',
             }
         } catch (error) {
-            throw new InternalServerErrorException({ status: 'error', message: error.message })
+            if (error instanceof NotFoundException) {
+                throw error
+            } else {
+                throw new InternalServerErrorException({ status: 'error', message: error.message })
+            }
         }
     }
 
@@ -83,7 +86,11 @@ export class ProductService {
                 message: 'Product retrieved successfully.',
             }
         } catch (error) {
-            throw new InternalServerErrorException({ status: 'error', message: error.message })
+            if (error instanceof NotFoundException) {
+                throw error
+            } else {
+                throw new InternalServerErrorException({ status: 'error', message: error.message })
+            }
         }
     }
 
@@ -126,9 +133,6 @@ export class ProductService {
             delete createDto.categories
             delete createDto.variations
 
-            const form = createDto.form as Prisma.JsonArray
-            createDto.form = form
-
             const create = await this.prisma.product.create(
                 {
                     data: {
@@ -148,7 +152,11 @@ export class ProductService {
                 message: 'Product created successfully.',
             }
         } catch (error) {
-            throw new InternalServerErrorException({ status: 'error', message: error.message })
+            if (error instanceof BadRequestException) {
+                throw error
+            } else {
+                throw new InternalServerErrorException({ status: 'error', message: error.message })
+            }
         }
     }
 
@@ -177,34 +185,19 @@ export class ProductService {
             delete updateDto.categories
             delete updateDto.variations
 
-            const form = updateDto.form as Prisma.JsonArray
-            updateDto.form = form
-
-            const update = await this.prisma.$transaction(async (prisma) => {
-                await prisma.product.update({
-                    where: { id: productId },
-                    data: {
-                        categories: {
-                            deleteMany: {}
-                        },
-                        variations: {
-                            deleteMany: {}
-                        },
-                    }
-                });
-
-                return await prisma.product.update({
-                    where: { id: productId },
-                    data: {
-                        ...updateDto,
-                        categories: {
-                            create: categoryOperations,
-                        },
-                        variations: {
-                            create: variationOperations,
-                        },
-                    }
-                });
+            const update = await this.prisma.product.update({
+                where: { id: productId },
+                data: {
+                    ...updateDto,
+                    categories: {
+                        deleteMany: {},
+                        create: categoryOperations,
+                    },
+                    variations: {
+                        deleteMany: {},
+                        create: variationOperations,
+                    },
+                },
             });
 
             return {
@@ -213,7 +206,11 @@ export class ProductService {
                 message: 'Product updated successfully.',
             }
         } catch (error) {
-            throw new InternalServerErrorException({ status: 'error', message: error.message })
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                throw error
+            } else {
+                throw new InternalServerErrorException({ status: 'error', message: error.message })
+            }
         }
     }
 
@@ -221,7 +218,7 @@ export class ProductService {
         try {
             const productId = Number(id)
 
-            await this.getProduct(productId)
+            await this.getProduct(productId) // Check if product exist
             await Promise.all([
                 this.prisma.categoriesOnProducts.deleteMany({
                     where: { productId: productId },
@@ -238,7 +235,11 @@ export class ProductService {
                 message: 'Product deleted successfully.',
             }
         } catch (error) {
-            throw new InternalServerErrorException({ status: 'error', message: error.message })
+            if (error instanceof NotFoundException) {
+                throw error
+            } else {
+                throw new InternalServerErrorException({ status: 'error', message: error.message })
+            }
         }
     }
 
@@ -305,6 +306,8 @@ export class ProductService {
             const codeJoined = codeExist.map(product => product.productCode).join(', ');
             throw new BadRequestException({ status: 'error', message: `Product code ${codeJoined} already exist for other product` })
         }
+
+        return true;
     }
 
     private capitalize(str: string): string {

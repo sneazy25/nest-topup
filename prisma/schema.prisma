@@ -26,7 +26,6 @@ model Product {
   poster        String @db.VarChar(100)
   categories    CategoriesOnProducts[]
   variations    Variation[]
-  form          Json
   discounts     Discount[]
   transactions  Transaction[]
   published     Boolean? @default(true)
