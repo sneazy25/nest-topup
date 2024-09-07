@@ -1,0 +1,33 @@
+import { ConfigService } from '@nestjs/config';
+import { Queue } from 'bull';
+import { PrismaService } from 'src/prisma.service';
+import { Prisma } from '@prisma/client';
+import { HttpService } from '@nestjs/axios';
+import { DiscountService } from 'src/discount/discount.service';
+import { CreateTransactionDto } from './create.dto';
+import { ResponseInterface } from './response.interface';
+export declare class TransactionService {
+    private readonly prisma;
+    private readonly httpService;
+    private readonly configService;
+    private readonly discount;
+    private readonly topupQueue;
+    private duitkuDomain;
+    private duitkuMerchantCode;
+    private duitkuApiKey;
+    constructor(prisma: PrismaService, httpService: HttpService, configService: ConfigService, discount: DiscountService, topupQueue: Queue);
+    findAll(searchTerm: string | null, perPage: number, page: number, paymentStatus: string | null, topupStatus: string | null, startDate: Date | null, endDate: Date | null, orderBy: Prisma.TransactionOrderByWithRelationInput): Promise<object>;
+    getInvoice(id: string): Promise<object>;
+    checkPayment(id: string): Promise<object>;
+    createInvoice(data: CreateTransactionDto): Promise<object>;
+    updateInvoice(data: ResponseInterface): Promise<object>;
+    getPaymentMethod(amount: number): Promise<any>;
+    exportXLS(searchTerm: string | null, perPage: number, page: number, paymentStatus: string | null, topupStatus: string | null, startDate: Date | null, endDate: Date | null, orderBy: Prisma.TransactionOrderByWithRelationInput): Promise<any>;
+    private checkCustomer;
+    private generateInvoiceId;
+    private createUniqueID;
+    private hash;
+    private readableDate;
+    private formatToIDR;
+    private padZero;
+}

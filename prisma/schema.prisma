@@ -1,0 +1,149 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+model User {
+  id          Int     @default(autoincrement()) @id
+  name        String
+  email       String  @unique
+  role        Role    @default(USER)
+  password    String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+}
+
+model Product {
+  id            Int      @default(autoincrement()) @id
+  title         String
+  slug          String @db.VarChar(50) @unique
+  description   String @db.Text
+  poster        String @db.VarChar(100)
+  categories    CategoriesOnProducts[]
+  variations    Variation[]
+  form          Json
+  discounts     Discount[]
+  transactions  Transaction[]
+  published     Boolean? @default(true)
+  deletedAt     DateTime? @db.Timestamp(6) @map("deleted_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+}
+
+model Category {
+  id            Int      @default(autoincrement()) @id
+  name          String
+  slug          String   @db.VarChar(50) @unique
+  products      CategoriesOnProducts[]
+}
+
+model CategoriesOnProducts {
+  productId     Int
+  categoryId    Int
+  product       Product     @relation(fields: [productId], references: [id])
+  category      Category    @relation(fields: [categoryId], references: [id])
+
+  @@id([productId, categoryId])
+}
+
+model Variation {
+  id            Int      @default(autoincrement()) @id
+  product       Product  @relation(fields: [productId], references: [id])
+  productId     Int
+  productCode   String   @db.VarChar(50) @unique
+  title         String
+  description   String   @db.Text
+  price         Decimal  @db.Decimal(10, 2)
+  transactions  Transaction[]
+  published     Boolean? @default(true)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+}
+
+model Discount {
+  id            Int      @default(autoincrement()) @id
+  discountCode  String   @unique
+  product       Product? @relation(fields: [productId], references: [id])
+  productId     Int?
+  title         String
+  description   String   @db.Text
+  minPrice      Decimal? @db.Decimal(10, 2)
+  maxPrice      Decimal? @db.Decimal(10, 2)
+  limit         Int
+  usage         Int
+  startDate     DateTime?
+  endDate       DateTime?
+  type          DiscountType
+  percentage    Decimal? @db.Decimal(3, 0)
+  priceReduce   Decimal? @db.Decimal(10, 2)
+  published     Boolean? @default(false)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+}
+
+model Transaction {
+  id            Int      @default(autoincrement()) @id
+  trxId         String   @unique
+  product       Product  @relation(fields: [productId], references: [id])
+  productId     Int
+  variation     Variation  @relation(fields: [variationId], references: [id])
+  variationId   Int
+  customer      Json
+  duitku        Json?
+  apigames      Json?
+  amount        Decimal  @db.Decimal(10, 2)
+  refundTo      Json?
+  paymentStatus PaymentStatus
+  topupStatus   TopupStatus
+  refund        Refund?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+}
+
+model Refund {
+  id            Int          @default(autoincrement()) @id
+  transaction   Transaction  @relation(fields: [refId], references: [trxId])
+  refId         String       @unique
+  merchant      String
+  destination   String
+  status        RefundStatus
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+}
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum DiscountType {
+  percentage
+  price_reduce
+}
+
+enum PaymentStatus {
+  pending
+  success
+  failed
+}
+
+enum TopupStatus {
+  pending
+  process
+  success
+  partial
+  failed
+  validation
+}
+
+enum RefundStatus {
+  pending
+  success
+  failed
+}
