@@ -1,73 +1,104 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Nest Topup Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A feature-rich **NestJS** service for Games top-ups. This service integrates with multiple top-up providers and allows easy extension for additional providers. Designed with a modular architecture, it supports customization and scalability, making it suitable for both small and large-scale applications.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- **Provider Integration**: Easily integrate with multiple top-up providers through configurable modules. Currently using [API Games](https://apigames.id/) for top-up games provider. And [Duitku](https://www.duitku.com/payment-gateway/) for payment gateway provider.
+- **Transaction Management**: Track and manage top-up transactions with comprehensive logging.
+- **Authentication**: Secure API endpoints using JWT authentication.
+- **Role-Based Access Control**: Assign roles to manage access to specific endpoints.
+- **Error Handling**: Robust error handling to ensure smooth user experience and logging.
+- **Customizable**: Easily add or modify providers with minimal changes to the existing structure.
+- **Modular Architecture**: Clean, scalable codebase following best practices for NestJS projects.
+## Getting Started
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Prerequisites
+
+- **Node.js** >= 14.x
+- **NestJS** >= 7.x
+- **PostgreSQL** (or another supported database)
+- **PrismaORM** (for database interactions)
+- **Redis** (optional for caching, but recommended)
+
 
 ## Installation
 
-```bash
-$ npm install
-```
-
-## Running the app
+1. Clone the repository:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+git clone https://github.com/vortex-byte/nest-topup.git
+cd nest-topup
 ```
 
-## Test
+2. Install dependencies:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Support
+3. Configure environment variables:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Create a `.env` file in the root directory and define the following variables:
 
-## Stay in touch
+```bash
+APP_NAME=
+APP_HOST=
+DATABASE_URL=
+JWT_SECRET=
+ENCRYPT_SECRET= # secret key for refund signature
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+DUITKU_DOMAIN=
+DUITKU_API_KEY=
+DUITKU_MERCHANT_CODE=
+DUITKU_CALLBACK_URL=
 
-## License
+APIGAMES_DOMAIN=
+APIGAMES_API_KEY=
+APIGAMES_MERCHANT_CODE=
+REFUND_FORM_URL=
 
-Nest is [MIT licensed](LICENSE).
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_USERNAME=
+EMAIL_PASSWORD=
+
+REDIS_HOST=
+REDIS_PORT=
+REDIS_PASSWORD=
+REDIS_DB=
+```
+
+4. Run database migrations:
+
+```bash
+npx prisma migrate dev --name init
+```
+
+5. Start the application:
+
+For production mode
+
+```bash
+npm run start
+```
+
+For development mode
+
+```bash
+npm run start:dev
+```
+## API Reference
+
+Postman collection documentation is available at [API Documentation](https://documenter.getpostman.com/view/26330471/2sAXxP8sLC)
+
+
+## Contributing
+
+Contributions are welcome! Feel free to submit a pull request or open an issue for any feature requests or bugs.
+
+
+## Authors
+
+- [@vortex-byte](https://www.github.com/vortex-byte)
+
