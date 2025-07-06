@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-// import { PrismaService } from '../prisma.service';
+// import { PrismaService } from '../prisma.service'; ← sudah dihapus
 
 @Module({
-    providers: [PrismaService]
+  // providers: [PrismaService], ← hapus ini
 })
-export class NotificationQueueModule { }
+export class NotificationQueueModule {}
